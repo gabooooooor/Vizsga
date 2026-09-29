@@ -1,13 +1,18 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package torok.gabriel.vizsga;
 
-/**
- *
- * @author ministar
- */
-public class NewPart {
-    
+import java.util.ArrayList;
+
+public class NewPart extends Part {
+
+    public NewPart(String id, String partNumber, String name, String category,
+            double purchasePrice, double sellingPrice, int quantity,
+            ArrayList<String> compatibleModels) {
+        super(id, partNumber, name, category, purchasePrice,
+                sellingPrice, quantity, compatibleModels);
+    }
+
+    @Override
+    public String getConditionName() {
+        return "NEW";
+    }
 }

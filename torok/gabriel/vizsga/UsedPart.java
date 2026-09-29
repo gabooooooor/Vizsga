@@ -1,13 +1,25 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package torok.gabriel.vizsga;
 
-/**
- *
- * @author ministar
- */
-public class UsedPart {
-    
+import java.util.ArrayList;
+
+public class UsedPart extends Part {
+
+    private String sourceMachineId;
+
+    public UsedPart(String id, String partNumber, String name, String category,
+            double purchasePrice, double sellingPrice, int quantity,
+            ArrayList<String> compatibleModels, String sourceMachineId) {
+        super(id, partNumber, name, category, purchasePrice,
+                sellingPrice, quantity, compatibleModels);
+        this.sourceMachineId = sourceMachineId;
+    }
+
+    public String getSourceMachineId() {
+        return sourceMachineId;
+    }
+
+    @Override
+    public String getConditionName() {
+        return "USED";
+    }
 }
