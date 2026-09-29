@@ -23,7 +23,7 @@ public abstract class Machine extends BaseEntity implements Sellable{
             String status, int hours)
     {
         super(id);
-        this.manafacturer = manufacturer;
+        this.manufacturer = manufacturer;
         this.model = model;
         this.year = year;
         this.purchasePrice = purchasePrice;
