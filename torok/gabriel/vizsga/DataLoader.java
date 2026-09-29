@@ -10,8 +10,11 @@ import java.util.ArrayList;
 
 public class DataLoader {
 
+    private static final int YEAR_LENGTH = 4;
+
     private ArrayList<Machine> machines = new ArrayList<Machine>();
     private ArrayList<Part> parts = new ArrayList<Part>();
+    private ArrayList<SalvageEstimate> estimates = new ArrayList<SalvageEstimate>();
     private ArrayList<String> invalidItems = new ArrayList<String>();
 
     // rules read from the "meta" part of data.json
@@ -21,19 +24,32 @@ public class DataLoader {
     private ArrayList<String> allowedStatuses;
     private ArrayList<String> allowedCategories;
 
-    public ArrayList<Machine> getMachines() { return machines; }
-    public ArrayList<Part> getParts() { return parts; }
-    public ArrayList<String> getInvalidItems() { return invalidItems; }
+    public ArrayList<Machine> getMachines() {
+        return machines;
+    }
+
+    public ArrayList<Part> getParts() {
+        return parts;
+    }
+
+    public ArrayList<SalvageEstimate> getEstimates() {
+        return estimates;
+    }
+
+    public ArrayList<String> getInvalidItems() {
+        return invalidItems;
+    }
 
     public void readData(String path) throws IOException {
         FileReader reader = new FileReader(path);
         try {
             JsonObject root = new JsonParser().parse(reader).getAsJsonObject();
             currentYear = Integer.parseInt(
-                    root.get("inventoryDate").getAsString().substring(0, 4));
+                    root.get("inventoryDate").getAsString().substring(0, YEAR_LENGTH));
             loadMeta(root.getAsJsonObject("meta"));
             loadMachines(root.getAsJsonArray("machines"));
             loadParts(root.getAsJsonArray("parts"));
+            loadEstimates(root.getAsJsonArray("salvageEstimates"));
         } finally {
             reader.close();
         }
@@ -70,7 +86,7 @@ public class DataLoader {
             return "unknown";
         }
     }
-    
+
     private void loadMachines(JsonArray array) {
         for (int i = 0; i < array.size(); i++) {
             JsonElement el = array.get(i);
@@ -127,8 +143,8 @@ public class DataLoader {
             throw new DomainValidationException("duplicate id");
         }
     }
-    
-        private void loadParts(JsonArray array) {
+
+    private void loadParts(JsonArray array) {
         for (int i = 0; i < array.size(); i++) {
             JsonElement el = array.get(i);
             try {
@@ -200,6 +216,20 @@ public class DataLoader {
             String source = ((UsedPart) p).getSourceMachineId();
             if (source != null && findMachine(source) == null) {
                 throw new DomainValidationException("unknown source machine: " + source);
+            }
+        }
+    }
+
+    private void loadEstimates(JsonArray array) {
+        for (int i = 0; i < array.size(); i++) {
+            try {
+                JsonObject o = array.get(i).getAsJsonObject();
+                estimates.add(new SalvageEstimate(
+                        o.get("machineId").getAsString(),
+                        o.get("estimatedLaborCost").getAsDouble(),
+                        o.get("estimatedTransportCost").getAsDouble()));
+            } catch (RuntimeException e) {
+                invalidItems.add("SalvageEstimate #" + i + ": parsing error");
             }
         }
     }

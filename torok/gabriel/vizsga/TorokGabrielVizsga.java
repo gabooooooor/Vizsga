@@ -1,16 +1,20 @@
-
 package torok.gabriel.vizsga;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class TorokGabrielVizsga {
 
-        public static void main(String[] args) {
+    private static final String INPUT_FILE = "data.json";
+    private static final String REPORT_FILE = "report.txt";
+    private static final String INVALID_FILE = "invalid_items.txt";
+
+    public static void main(String[] args) {
         DataLoader loader = new DataLoader();
         try {
-            loader.readData("data.json");
+            loader.readData(INPUT_FILE);
         } catch (FileNotFoundException e) {
-            System.out.println("data.json not found: " + e.getMessage());
+            System.out.println(INPUT_FILE + " not found: " + e.getMessage());
             return;
         } catch (IOException e) {
             System.out.println("Read error: " + e.getMessage());
@@ -20,11 +24,19 @@ public class TorokGabrielVizsga {
             System.out.println("Invalid file structure: " + e.getMessage());
             return;
         }
+
         System.out.println("Machines: " + loader.getMachines().size());
         System.out.println("Parts: " + loader.getParts().size());
-        for (String s : loader.getInvalidItems()) {
-            System.out.println("INVALID " + s);
+        System.out.println("Invalid records: " + loader.getInvalidItems().size());
+
+        ReportGenerator gen = new ReportGenerator(loader.getMachines(),
+                loader.getParts(), loader.getEstimates());
+        try {
+            gen.writeReport(REPORT_FILE);
+            gen.writeInvalid(INVALID_FILE, loader.getInvalidItems());
+            System.out.println(REPORT_FILE + " and " + INVALID_FILE + " written.");
+        } catch (IOException e) {
+            System.out.println("Cannot write output: " + e.getMessage());
         }
     }
-    
 }
